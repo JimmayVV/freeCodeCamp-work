@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Simon Says</title>
+  
+  
+  
+  
+      <style>
+/* CP CSS goes here */
+@import url('https://fonts.googleapis.com/css?family=Orbitron');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #999;
+  font-family: 'Roboto', sans-serif;
+}
+
+#wrapper {
+  position: absolute;
+  display: table;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-collaps: collapse;
+  border-spacing: 0px;
+  background: #333;
+  border-radius: 100%;
+  width: 400px;
+  height: 400px;
+  border: 20px solid #333;
+}
+
+#wrapper .row {
+  display: table-row;
+  position: relative;
+}
+
+#wrapper:after, #wrapper:before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  background: #333;
+}
+
+#wrapper:before {
+  height: 14px;
+  width: 100%;
+  bottom: 50%;
+  left: 0;
+  margin-bottom: -7px;
+}
+
+#wrapper:after {
+  height: 100%;
+  width: 14px;
+  top: 0;
+  left: 50%;
+  margin-left: -7px;
+}
+
+#green, #red, #yellow, #blue {
+  position: relative;
+  display: table-cell;
+  width: 50%;
+  height: 50%;
+  padding: 5px;
+  background: #FFF;
+  pointer-events : auto;
+  cursor:pointer;
+}
+
+#green {
+  border-radius: 100% 0 0 0;
+  background: #090;
+}
+
+#green.active, #wrapper.clickable #green:active {
+  background: #1F1;
+}
+
+#red {
+  border-radius: 0 100% 0 0;
+  background: #900;
+}
+
+#red.active, #wrapper.clickable #red:active {
+  background: #F11;
+}
+
+#yellow {
+  border-radius: 0 0 0 100%;
+  background: #AA0;
+}
+
+#yellow.active, #wrapper.clickable #yellow:active {
+  background: #FF1;
+}
+
+#blue {
+  border-radius: 0 0 100% 0;
+  background: #037;
+}
+
+#blue.active, #wrapper.clickable #blue:active {
+  background: #22F;
+}
+
+#menu {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 7px;
+  background: #AAA;
+  border-radius: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  border: 7px solid #333;
+}
+
+#menu span, #menu button {
+  display: inline-block;
+}
+
+#menu #count {
+  font-family: 'Orbitron', sans-serif;
+  border: 2px solid #222;
+  border-radius: 5px;
+  text-align: center;
+  width: 50px;
+  height: 33px;
+  padding-top: 5px;
+  margin: 5px auto;
+  overflow: hidden;
+  background: #111;
+  color: #C00;
+  font-size: 1.3em;
+}
+
+#menu #count.off {
+  color: #300;
+}
+
+#menu button {
+  margin: 0 auto 5px;
+  background: #C60;
+  border-radius: 4px;
+  border-top: 2px solid #D71;
+  border-left: 2px solid #D71;
+  border-right: 2px solid #940;
+  border-bottom: 2px solid #940;
+  padding: 3px 15px;
+  font-size: 14px;
+}
+
+#menu button:active:not(:disabled) {
+  border-top: 2px solid #940;
+  border-left: 2px solid #940;
+  border-right: 2px solid #D71;
+  border-bottom: 2px solid #D71;
+  padding: 4px 14px 2px 16px;
+}
+
+#menu button:disabled {
+  border: 2px solid #999;
+  background: #CCC;
+  text-decoration: line-through;
+}
+
+#menu label {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 17px;
+}
+
+#menu input {
+  display: none;
+}
+
+#menu input:disabled + .slider {
+  cursor: default;
+}
+
+#menu .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+#menu .slider:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+#menu input:checked + .slider {
+  background-color: #2196F3;
+}
+
+#menu input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+#menu input:checked + .slider:before {
+  -webkit-transform: translateX(13px);
+  -ms-transform: translateX(13px);
+  transform: translateX(13px);
+}
+
+/* Rounded sliders */
+#menu .slider.round {
+  border-radius: 17px;
+}
+
+#menu .slider.round:before {
+  border-radius: 50%;
+}
+
+#menu label:after {
+  content: "";
+  display: block;
+}
+    </style>
+
+
+</head>
+
+<body>
+  <!-- CP html goes here -->
+
+<div id="wrapper">
+  <div class="row">
+    <div id="green"></div>
+    <div id="red"></div>
+  </div>
+  
+  <div class="row">
+    <div id="yellow"></div>
+    <div id="blue"></div>
+  </div>
+</div>
+
+<div id="menu">
+  Round<br>
+  <span id="count" class="off">00</span><br>
+  
+  <button id="start" disabled>Start</button>
+  <button id="restart" disabled>Restart</button>
+  
+  <br>Strict Mode:
+  <label id="strict">
+    <input type="checkbox" disabled>
+    <div class="slider round"></div>
+  </label>
+  
+  On/Off:
+  <label id="power">
+    <input type="checkbox">
+    <div class="slider round"></div>
+  </label>
+</div>
+  
+  <!-- End CP html -->
+  
+  <script>
+    // CP JS goes here
+// Time to write the game code! HTML & CSS are good enough for now!
+var Simon = function() {
+  // Private vars
+  var on = false;
+  var triesLeft = 3;
+  var ready = false;
+  var moveTimeout;
+  var moveIndex;
+  var buttons = [
+    document.querySelector('#green'),
+    document.querySelector('#red'),
+    document.querySelector('#yellow'),
+    document.querySelector('#blue')
+  ];
+  var audio = [
+    new Audio('https://s3.amazonaws.com/freecodecamp/simonSound1.mp3'),
+    new Audio('https://s3.amazonaws.com/freecodecamp/simonSound2.mp3'),
+    new Audio('https://s3.amazonaws.com/freecodecamp/simonSound3.mp3'),
+    new Audio('https://s3.amazonaws.com/freecodecamp/simonSound4.mp3')
+  ];
+  var goalPattern = [];
+  var timerIndex;
+  var strict = false;
+  
+  // Private functions
+  var startBtn = function() {
+    return document.querySelector('#start');
+  };
+  
+  var restartBtn = function() {
+    return document.querySelector('#restart');
+  };
+  
+  var strictBtn = function() {
+    return document.querySelector('#strict input');
+  };
+  
+  var onOffBtn = function() {
+    return document.querySelector('#power input');
+  };
+  
+  var countLabel = function() {
+    return document.querySelector('#count');
+  };
+  
+  var makeReady = function(val) {
+    if (val === true || val === false)
+      ready = val;
+    else
+      ready = true;
+    
+    var wrap = document.querySelector('#wrapper');
+    
+    if (ready) {
+      wrap.classList.add('clickable');
+    } else {
+      wrap.classList.remove('clickable')
+    }
+  };
+  
+  var displayMoves = function(index) {
+    index = index || 0;
+    // quick check to make sure there are even any moves to display
+    if (goalPattern.length === 0)
+      return 0;
+    
+    // Display the color
+    goalPattern[index].classList.add('active');
+    
+    audio[buttons.indexOf(goalPattern[index])].play();
+    
+    // After 1250 milliseconds, call a function which will process the turn off/proceed
+    // to next color
+    moveTimeout = setTimeout(function(){
+      // No matter what index we have, turn off all of the classes on the buttons
+      buttons.forEach(function(button){
+        button.classList.remove('active');
+      });
+      
+      // If this index is the last one in the moves array, then call the function
+      // to start listening for an input
+      if (index > goalPattern.length - 2) {
+        console.log('ready for input now!');
+        // Set this game object to be ready for a move to be played (otherwise we'll
+        // mess up the display of the pattern, so we need to lock it down, or in this
+        // case, 'unlock' it).
+        makeReady();
+        
+        // Set moveIndex to 0, so it will be ready to traverse the goalPattern
+        moveIndex = 0;
+        
+        moveTimeout = setTimeout(makeMove, 5000);
+        
+        // See above - call playMove after 5 seconds, which will have no parameters
+        // sent to it - this will trigger a bad move just the same as if the wrong
+        // color was pressed. Strict/non-strict rules will apply at that point
+      } else {
+        // If this is not the last index, then introduce a 500ms delay, before calling this
+        // same method again, but with the index incrimented
+        setTimeout(function(){
+          displayMoves(index + 1);
+        }, 250);
+      }
+      
+    }, 1250);
+  };
+  
+  var updateCount = function() {
+    var count = goalPattern.length;
+    var text = '0';
+    
+    if (count >= 10)
+      text = count + '';
+    else
+      text += count;
+    
+    countLabel().innerHTML = text;
+  };
+  
+  // This function is different from 'updateCount' because it will
+  // flash a message, rather than just update it
+  var updateDisplay = function(text) {
+    var temp = '';
+    var count = 0;
+    clearInterval(timerIndex);    // Just in case we press this a lot
+    makeReady(false);
+    
+    timerIndex = setInterval(function(){
+      if (temp === '') {
+        countLabel().innerHTML = temp;
+        temp = text;
+      } else {
+        countLabel().innerHTML = temp;
+        temp = '';
+      }
+      
+      if (count++ > 8) {
+        clearInterval(timerIndex);
+        updateCount();
+        if (goalPattern.length > 0)
+          makeReady();
+      }
+    }, 250);
+  };
+  
+  var makeMove = function(btn) {
+    clearTimeout(moveTimeout);
+    
+    if (btn == goalPattern[moveIndex]) {
+      // Check to see if this was the last move to make, if so, then console.log
+      //    that the player succeeded
+      // Set a timeout for the player to make a move, otherwise a bad move will be played
+      // 
+      moveIndex++;
+      
+      audio[buttons.indexOf(btn)].play();
+      
+      if (moveIndex >= 20) {
+        console.log('winner!');
+        
+        // Make a winner display
+        return restart();
+      }
+    } else if (triesLeft === 1 || strict) {
+      // Game is now over, time to turn off the game
+      console.log('game over');
+      return restart();
+    } else {
+      updateDisplay('!!');
+      console.log('Incorrect move');
+      triesLeft--;
+      moveIndex = 0;
+      moveTimeout = setTimeout(makeMove, 7000);
+    }
+    
+    // Check if this was the last move, at which point we will add a move to the moves array
+    if (moveIndex === goalPattern.length) {
+      // Disable the clickability of the buttons
+      makeReady(false);
+      // Display a confirmation that all the selections were correct
+      // by making the display blink
+      var count = 0;
+      var temp = '';
+      var text = countLabel().innerHTML;
+      
+      timerIndex = setInterval(function(){
+        if (temp === '') {
+          countLabel().innerHTML = temp;
+          temp = text;
+        } else {
+          countLabel().innerHTML = temp;
+          temp = '';
+        }
+        
+        if (count++ > 8) {
+          clearInterval(timerIndex);
+          // Add a move to the array
+          addPattern();
+        }
+      }, 250);
+    }
+    
+  };
+  
+  var addPattern = function() {
+    // Come up with an initial move
+    var index = Math.floor(Math.random() * 4);
+    goalPattern.push(buttons[index]);
+    triesLeft = 3;
+    // Update the round display to indicate we are on round 1
+    updateCount();
+    // Call the function used to display all of the given moves
+    displayMoves();
+  };
+  
+  var off = function() {
+    on = false;
+    ready = false;
+    startBtn().disabled = true;
+    restartBtn().disabled = true;
+    onOffBtn().checked = false;
+    strictBtn().checked = false;
+    strictBtn().disabled = true;
+    onOffBtn().checked = false;
+    countLabel().classList.add('off');
+    goalPattern = [];
+    updateCount();
+    makeReady(false);
+    clearTimeout(moveTimeout);
+    clearTimeout(timerIndex);
+    buttons.forEach(function(btn){
+      btn.classList.remove('active')
+    });
+  };
+  
+  var restart = function() {
+    goalPattern = [];
+    makeReady(false);
+    clearTimeout(moveTimeout);
+    clearTimeout(timerIndex);
+    updateDisplay('--');
+    buttons.forEach(function(btn){
+      btn.classList.remove('active')
+    });
+  };
+  
+  buttons.forEach(function(button){
+    // Add event listeners to process a selection
+    button.addEventListener('click', function(){
+      if (ready) {
+        makeMove(button);
+      }
+    });
+  });
+  
+  // Public functions
+  return {
+    isOn: function() {
+      return on;
+    },
+    on: function() {
+      if (on)
+        return 'game already started';
+      on = true;
+      goalPattern = [];
+      startBtn().disabled = false;
+      restartBtn().disabled = false;
+      countLabel().classList.remove('off');
+      strictBtn().disabled = false;
+      onOffBtn().checked = true;
+      buttons.forEach(function(btn){
+        btn.classList.remove('active')
+      });
+    },
+    off: function() {
+      off();
+    },
+    start: function() {
+      if (!on || goalPattern.length !== 0) {
+        console.log('Invalid option to start game!');
+      } else {
+        addPattern();
+      }
+    },
+    restart: function(){
+      if (on)
+        restart();
+    },
+    makeStrict: function(){
+      strict = true;
+      if (ready)
+        restart();
+    },
+    removeStrict: function(){
+      strict = false;
+      if (ready)
+        restart();
+    },
+    updateDisplay: function(txt) {
+      if (on)
+        updateDisplay(txt);
+    },
+    displayMoves: function() {
+      if (on)
+        displayMoves(0);
+    },
+    addMove: function(num) {
+      goalPattern.push(buttons[num]);
+      updateCount();
+    }
+  };
+};
+
+var game = new Simon();
+
+var power = document.querySelector('#power input');
+var strict = document.querySelector('#strict input');
+var red = document.querySelector('#red');
+var blue = document.querySelector('#blue');
+var green = document.querySelector('#green');
+var yellow = document.querySelector('#yellow');
+var startBtn = document.querySelector('#start');
+var restartBtn = document.querySelector('#restart');
+
+startBtn.addEventListener('click', function(){
+  game.start();
+});
+
+restartBtn.addEventListener('click', function(){
+  game.restart();
+});
+
+power.onchange = function(){
+  if (game.isOn())
+    game.off();
+  else
+    game.on();
+};
+
+strict.onchange = function(){
+  if (this.checked) {
+    game.makeStrict();
+  } else {
+    game.removeStrict();
+  }
+};
+  </script>
+
+</body>
+</html>

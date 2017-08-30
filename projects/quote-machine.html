@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Random Quote Machine</title>
+  
+  
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+  
+      <style>
+/* CP CSS goes here */
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#container {
+  /*position: absolute;*/
+  margin: 40% auto 0;
+  transform: translateY(-50%);
+  width: 40%;
+  padding: 20px;
+  background-color: #DDD;
+  border-radius: 20px;
+}
+
+#quote {
+  font-size: 1.5em;
+}
+
+#author {
+  text-align: right;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+#author:before {
+  content: " - ";
+}
+
+.button {
+  cursor: pointer;
+  border: none;
+  color: #FFF;
+  padding: 10px 30px;
+  margin: 0;
+  font-size: 20px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+#row {
+  width: 100%;
+}
+
+#row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+a[name="twitter"] {
+  float: left;
+}
+
+a[name="newQuote"] {
+  float: right;
+}
+
+body, .button {
+  background-color: #C00;
+}
+
+body, .button, #container {
+  transition: background-color 2s, height 2s, transform 2s;
+}
+    </style>
+
+
+</head>
+
+<body>
+  <!-- CP html goes here -->
+  
+<div id="container">
+  <div id="quote"></div>
+  <div id="author"></div>
+  
+  <div id="row">
+    <a href="#" class="button" name="twitter" target="_blank">
+      <i class="fa fa-twitter" aria-hidden="true"></i>
+    </a>
+    <a href="#" class="button" name="newQuote">New Quote</a>
+  </div>
+</div>
+  
+  <!-- End CP html -->
+  
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+  
+  <script>
+    // CP JS goes here
+$(document).ready(function(){
+  var quotes = [{
+    quote: "Moral indignation is jealousy with a halo",
+    author: "H. G. Wells"
+  }, {
+    quote: "Glory is fleeting, but obscurity is forever",
+    author: "Napoleon Bonaparte"
+  }, {
+    quote: "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts",
+    author: "Bertrand Russell"
+  }, {
+    quote: "Victory goes to the player who makes the next-to-last mistake",
+    author: "Chessmaster Savielly Grigorievitch Tartakower"
+  }];
+  
+  function newQuote() {
+    var index = Math.floor(Math.random() * quotes.length);
+    var quote = quotes[index];
+    
+    $("#quote").html(quote.quote);
+    $("#author").html(quote.author);
+    
+    var twitter = "https://twitter.com/intent/tweet?";
+    
+    twitter += "text=\"" + quote.quote + "\" " + quote.author;
+    twitter += "&hashtags=quotes&related=freecodecamp";
+    
+    $('a[name="twitter"]').attr("href", twitter);
+    
+    // Change the color
+    var r = Math.floor(Math.random() * 256);
+    var g = Math.floor(Math.random() * 256);
+    var b = Math.floor(Math.random() * 256);
+    
+    var color = "rgb(" + r + ", " + g + ", " + b + ")";
+    
+    $("body, .button").css("background-color", color);
+  };
+  
+  $('.button[name="newQuote"]').on("click", function(){
+    newQuote();
+    return false;
+  });
+  
+  newQuote();
+});
+  </script>
+
+</body>
+</html>

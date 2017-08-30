@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Local Weather</title>
+  
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css'>
+  <link rel='stylesheet prefetch' href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+  
+  
+      <style>
+/* CP CSS goes here */
+body {
+  background-color: #666;
+  color: #DDD !important;
+}
+
+h1 {
+  font-size: 6rem;
+}
+
+h2 {
+  font-size: 4rem;
+}
+
+#icon img {
+  width: 50%;
+}
+
+a.degLabel {
+  cursor: pointer;
+}
+    </style>
+
+
+</head>
+
+<body>
+  <!-- CP html goes here -->
+
+<div class="container text-center">
+  <h1>freeCodeCamp Weather App</h1>
+  <h2 id="city">City</h2>
+  <h2><span id="temp">Temp</span>&deg;<a class="degLabel">F</a></h2>
+  <h2 id="condition">Condition</h2>
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4"><div id="icon">Icon</div></div>
+  </div>
+</div>
+  
+  <!-- End CP html -->
+  
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+  
+  <script>
+    // CP JS goes here
+weather = null;
+
+$(document).ready(function(){
+  var latitude = null;
+  var longitude = null;
+  var url = "http://api.openweathermap.org/data/2.5/weather?"  // lat=35&lon=139
+  var appid = "fd483c1b816126c6ab12baa3832b117c";
+  var apiCall;
+  
+  function displayLocation() {
+    $("#coords").text("Latitude: " + latitude + "  Longitude: " + longitude);
+  }
+  
+  function getLocation() {
+    // Reset the location
+    latitude = null;
+    longitude = null;
+
+    /*
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+
+        displayLocation();
+      });
+    }*/
+
+    
+    $.getJSON("http://ip-api.com/json/?callback=?", function(data) {
+        longitude = data.lon;
+        latitude = data.lat;
+
+        //displayLocation();
+        getWeather();
+    });
+  }
+  
+  function getWeather(units = "imperial") {
+    var str = url + "lat=" + latitude + "&lon=" + longitude + "&units=" + units + "&APPID=" + appid;
+    $("#coords").append("<br>" + str);
+
+    $.getJSON({
+      url: str
+    })
+    .done(function(data) {
+      weather = data;
+      renderWeather();
+    })
+    .fail(function(){
+      alert("unable to retrieve weather");
+    });
+  }
+  
+  // Process the results of the JSON request from 'getWeather()
+  function renderWeather() {
+    $("#city").text(weather.name + ", " + weather.sys.country);
+    $("#temp").text(Math.floor(weather.main.temp + 0.5));
+    $("#condition").text(capitalize(weather.weather[0].description));
+    $("#icon").html('<img src="http://openweathermap.org/img/w/' + weather.weather[0].icon + '.png" class="img-responsive center-block">')
+  }
+
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  
+  $("a.degLabel").on("click", function() {
+    var $label = $("a.degLabel");
+
+    if ($label.text() === 'F') {
+      $label.text('C');
+      getWeather('metric');
+    } else {
+      $label.text('F');
+      getWeather();
+    }
+  });
+
+  /*
+  $("button").on("click", function(){
+    getWeather();
+  });*/
+  
+  getLocation();
+});
+  </script>
+
+</body>
+</html>

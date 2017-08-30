@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Javascript Calculator</title>
+  
+  
+  
+  
+      <style>
+/* CP CSS goes here */
+@import url('https://fonts.googleapis.com/css?family=Fira+Mono');
+
+body, button {
+  font-family: 'Fira Mono', monospace;
+}
+
+body {
+  background-color: #666;
+}
+
+#wrapper {
+  background-color: #FFD;
+  width: 350px;
+  margin: 100px auto;
+  padding: 20px;
+  border: 2px solid #FD9;
+  border-radius: 15px;
+}
+
+section#display {
+  background: #EEE;
+  border: 2px solid #CCC;
+  border-radius: 10px;
+  padding: 7px;
+}
+
+#display #input {
+  overflow: hidden;
+  text-align: right;
+  color: #444;
+  font-size: 3.5em;
+}
+
+#display #running-eval {
+  overflow: hidden;
+  text-align: right;
+  color: #999;
+}
+
+#nums {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#nums:after {
+  content: " ";
+  float: left;
+  clear: both;
+}
+
+#nums .row {
+  position: relative;
+  width: 100%;
+  height: 70px;
+}
+
+#nums .row .button {
+  width: 25%;
+  height: 100%;
+  float: left;
+  text-align: center;
+  padding: 5px 5px;
+  position: relative;
+  
+  -moz-box-sizing: border-box; 
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#nums .row .button.two-col {
+  width: 50%;
+}
+
+#nums .row .two-row {
+  height: 200%;
+  float: right;
+  z-index: 1;
+}
+
+#nums .row .button button {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #000;
+  background: #E96;
+  border-radius: 5px;
+  font-size: 1.8rem;
+}
+
+#nums .row .button button:hover {
+  background: #D85;
+}
+
+#nums .row .button button:active {
+  margin-top: 2px;
+  margin-bottom: -2px;
+  margin-right: -1px;
+  margin-left: 1px;
+}
+    </style>
+
+
+</head>
+
+<body>
+  <!-- CP html goes here -->
+
+<div id="wrapper">
+  <section id="display">
+    <div id="input">
+      0123456789
+    </div>
+    <div id="running-eval">
+      0123456789+987654321/123456789
+    </div>
+  </section>
+  
+  <section id="nums">
+    <div class="row">
+      <div class="button"><button class="allClear">AC</button></div>
+      <div class="button"><button class="clear">CE</button></div>
+      <div class="button"><button>&divide;</button></div>
+      <div class="button"><button>&times;</button></div>
+    </div>
+    
+    <div class="row">
+      <div class="button"><button class="num">7</button></div>
+      <div class="button"><button class="num">8</button></div>
+      <div class="button"><button class="num">9</button></div>
+      <div class="button"><button>-</button></div>
+    </div>
+    
+    <div class="row">
+      <div class="button"><button class="num">4</button></div>
+      <div class="button"><button class="num">5</button></div>
+      <div class="button"><button class="num">6</button></div>
+      <div class="button"><button>+</button></div>
+    </div>
+    
+    <div class="row">
+      <div class="button"><button class="num">1</button></div>
+      <div class="button"><button class="num">2</button></div>
+      <div class="button"><button class="num">3</button></div>
+      <div class="button two-row"><button>=</button></div>
+    </div>
+    
+    <div class="row">
+      <div class="button two-col"><button class="num">0</button></div>
+      <div class="button"><button>.</button></div>
+    </div>
+    
+  </section>
+</div>
+  
+  <!-- End CP html -->
+  
+  <script>
+    // CP JS goes here
+var calc = function(obj1, obj2) {
+  var curVal = [0];
+  var algorithm = [];
+  var displays = {main: obj1, secondary: obj2};
+  
+  this.init = function(){
+    this.displayVal();
+    this.displayAlgorithm();
+  };
+  
+  this.setDisplays = function(obj1, obj2) {
+    displays.main = obj1;
+    displays.secondary = obj2;
+  };
+  
+  this.displayVal = function() {
+    displays.main.innerHTML = this.getVal();
+  };
+  
+  this.displayAlgorithm = function() {
+    var alg = displays.secondary;
+    alg.innerHTML = algorithm.join('');
+  };
+  
+  this.getVal = function() {
+    if (curVal[0] === 0) return 0;
+    
+    return curVal.join('');
+  };
+  
+  this.calculate = function() {
+    if (this.getVal() !== 0) {
+      algorithm.push(this.getVal());
+    }
+    
+    if (algorithm.length > 2 && algorithm.length % 2 === 0) {
+      algorithm.pop()
+    }
+    
+    return eval(algorithm.join(''));
+  }
+  
+  this.pushVal = function(val) {
+    // Test to make sure something other than a number was passed in
+    if (!/[0-9]+/g.test(val)) {
+      // Check for each case
+      // If the val is a decimal point, check to make sure there isn't already a decimal point
+      if (val === '.' && curVal.indexOf(val) < 0) {
+        curVal.push(val);
+      } else if (escape(val) === '%F7' && (algorithm.length % 2 === 0) && this.getVal() !== 0) {
+        algorithm.push(this.getVal());
+        algorithm.push('/');
+        this.clear();
+      } else if (escape(val) === '%D7' && (algorithm.length % 2 === 0) && this.getVal() !== 0) {
+        algorithm.push(this.getVal());
+        algorithm.push('*');
+        this.clear();
+      } else if (val === '-' && (algorithm.length % 2 === 0) && this.getVal() !== 0) {
+        algorithm.push(this.getVal());
+        algorithm.push('-');
+        this.clear();
+      } else if (val === '+' && (algorithm.length % 2 === 0) && this.getVal() !== 0) {
+        algorithm.push(this.getVal());
+        algorithm.push('+');
+        this.clear();
+      } else if (val === '=') {
+        curVal = [this.calculate()];
+        algorithm = [];
+        //var calc = this.calculate();
+      }
+    } else { // else, a number WAS passed in, thus compute it
+      // If curVal is zero, then initialize curVal to the current value
+      // (which of course, could be zero, but that won't change this if
+      // statement in any meaningful way)
+      if (this.getVal() === 0) curVal = [val];
+      else curVal.push(val);  // If curVal is not zero, then append val to it
+    }
+    
+    this.displayVal();
+    this.displayAlgorithm();
+  };
+  
+  this.clear = function() {
+    curVal = [0];
+    this.displayVal();
+  };
+  
+  this.allClear = function() {
+    algorithm = [];
+    this.clear();
+    this.displayAlgorithm();
+  }
+  
+  this.init();
+};
+
+var calculator = new calc(
+  document.getElementById('input'),
+  document.getElementById('running-eval')
+);
+
+// Set event listeners to all of the number buttons
+document.querySelectorAll('#nums .row .button button')
+        .forEach(
+        function(obj){
+          obj.addEventListener("click", function(){
+            calculator.pushVal(obj.innerHTML);
+          });
+        });
+
+// Set clear buttons (may remove and have above function cover this)
+document.querySelector('#nums button.clear')
+        .addEventListener("click", function(){
+          calculator.clear();
+        });
+
+document.querySelector('#nums button.allClear')
+        .addEventListener("click", function(){
+          calculator.allClear();
+        });
+  </script>
+
+</body>
+</html>

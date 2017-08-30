@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Pomodoro Clock</title>
+  
+  
+  
+  
+      <style>
+/* CP CSS goes here */
+@import url('https://fonts.googleapis.com/css?family=Patrick+Hand+SC');
+
+html,
+body {
+  background: #778899;
+  height: 100%;
+  margin: 0;
+  font-family: 'Patrick Hand SC', cursive;
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+body {
+  text-align: center;
+}
+
+#wrapper {
+  display: inline-block;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#display {
+  background: #C00;
+  width: 200px;
+  height: 200px;
+  border: 5px solid #000;
+  border-radius: 50%;
+  line-height: 200px;
+  text-align: center;
+  font-size: 70px;
+  position: relative;
+  cursor: pointer;
+}
+
+#display.break {
+  background-color: #C00;
+}
+
+#display.session {
+  background-color: #0C0;
+}
+
+#display:before {
+  content: " ";
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: 5px solid #778899;
+  border-radius: 50%;
+}
+
+#labels {
+  display: table;
+  width: 100%;
+  margin-bottom: 25px;
+  font-size: 2em;
+}
+
+#labels .row {
+  display: table-row;
+  cursor: default;
+}
+
+#labels .row .content, #labels .row .title {
+  display: table-cell;
+}
+    </style>
+
+
+</head>
+
+<body>
+  <!-- CP html goes here -->
+
+<div id="wrapper">
+  
+  <div id="labels">
+    <div class="row">
+      <div class="title">Break</div>
+      <div class="title">Session</div>
+    </div>
+    <div class="row">
+      <div class="content" id="breakContent">
+        <span class='minus'>-</span>
+        <span class="value">5</span>
+        <span class="add">+</span>
+      </div>
+      <div class='content' id="sessionContent">
+        <span class='minus'>-</span>
+        <span class="value">20</span>
+        <span class="add">+</span></div>
+    </div>
+  </div>
+
+  <div id="display" class="session"></div>
+
+</div>
+  
+  <!-- End CP html -->
+  
+  <script>
+    // CP JS goes here
+var clock = function(mins, theDisplay) {
+  var minutes = mins;
+  var seconds = minutes * 60;
+  var display = theDisplay;  // DOM object containing the display for the timer
+  var running = false;
+  var ticker;
+  var self = this;          // To avoid 'this' bugs within callback functions, just set 'this' to 'self' and use self everywhere
+  var finished = false;
+
+  this.start = function() {
+    clearTimeout(self.ticker);
+    if (seconds > 0) {
+      self.running = true;
+      self.tick();
+    } else {
+      alert('Invalid option (start) for this timer');
+    }
+  };
+  
+  this.restart = function() {
+    seconds = minutes * 60;
+    finished = false;
+    self.start();
+  };
+  
+  this.reset = function(num) {
+    this.pause();
+    minutes = num;
+    seconds = minutes * 60;
+    //self.updateDisplay();
+  }
+  
+  this.pause = function() {
+    self.running = false;
+    clearTimeout(self.ticker);
+  }
+  
+  this.toggle = function() {
+    if (self.running) {
+      this.pause();
+    } else {
+      this.start();
+    }
+  }
+
+  this.tick = function() {
+    if (seconds >= 0 && self.running) {
+      // Call timer tick function again using timeout
+      self.ticker = setTimeout(self.tick, 1000);
+      // Update display of timer
+      self.updateDisplay();
+      // Decrement seconds so that this will eventually end
+      seconds--;
+    } else if (seconds < 0) {
+      self.finish();
+    }
+  };
+
+  this.updateDisplay = function() {
+    display.innerHTML = self.toString();
+    //displayCallback(self.makeTime);
+  };
+
+  this.toString = function() {
+    var val = self.getSeconds();
+    val = (val < 0) ? 0 : val;
+    
+    var minutes = Math.floor(val / 60);
+    var secs = val % 60;
+
+    var str = minutes + ':';
+
+    if (secs < 10) str += '0';
+
+    str += secs;
+
+    return str;
+  }
+
+  this.getSeconds = function() {
+    return seconds;
+  };
+  
+  this.finish = function() {
+    self.finished = true;
+    var event = new Event('finishTimer');
+    display.dispatchEvent(event);
+  };
+  
+  this.isRunning = function() {
+    // Double ! to ensure a boolean is provided
+    return !!self.running;
+  };
+  
+};
+
+// These two variables will contain the current settings for however many minutes
+// each timer should be
+var sessionMinutes = 10;
+var breakMinutes = 5;
+
+// Get the 3 elements which will be edited dynamically
+var display = document.querySelector('#display');
+var sessionDisplay = document.querySelector('#sessionContent .value');
+var breakDisplay = document.querySelector('#breakContent .value');
+
+// Create the actual timers
+var session = new clock(sessionMinutes, display);
+var breakTimer = new clock(breakMinutes, display);
+
+// Set the active variable to session (the initial default).
+// This will contain whichever timer needs to be active
+var active = session;
+
+// Render the initial state of the timer & timerMinutes
+active.updateDisplay();
+sessionDisplay.innerHTML = sessionMinutes;
+breakDisplay.innerHTML = breakMinutes;
+
+
+// Listen for the timer button to be clicked on which will pause/start the active timer
+display.addEventListener('click', function(){
+  active.toggle();
+});
+
+// Listen to the four +/- options between break and session options
+document.querySelector('#sessionContent .minus').addEventListener('click', function(){
+  if (sessionMinutes > 1) {
+    sessionMinutes--;
+    sessionDisplay.innerHTML = sessionMinutes;
+    session.reset(sessionMinutes);
+  }
+  
+  active.updateDisplay();
+});
+
+document.querySelector('#sessionContent .add').addEventListener('click', function(){
+  if (sessionMinutes < 99) {
+    sessionMinutes++;
+    sessionDisplay.innerHTML = sessionMinutes;
+    session.reset(sessionMinutes);
+  }
+  
+  active.updateDisplay();
+});
+
+document.querySelector('#breakContent .minus').addEventListener('click', function(){
+  if (breakMinutes > 1) {
+    breakMinutes--;
+    breakDisplay.innerHTML = breakMinutes;
+    breakTimer.reset(breakMinutes);
+  }
+  
+  active.updateDisplay();
+});
+
+document.querySelector('#breakContent .add').addEventListener('click', function(){
+  if (breakMinutes < 99) {
+    breakMinutes++;
+    breakDisplay.innerHTML = breakMinutes;
+    breakTimer.reset(breakMinutes);
+  }
+  
+  active.updateDisplay();
+});
+
+// Listen for a timer to finish, which will then swap timers and restart the other one
+display.addEventListener('finishTimer', function() {
+  
+  if (active == session) {
+    active = breakTimer;
+    display.classList.remove('session');
+    display.classList.add('break');
+  } else {
+    active = session;
+    display.classList.add('session');
+    display.classList.remove('break');
+  }
+  // Automatically start the next timer using the restart function
+  // (this covers the fact that it was never reset when it finished the first time)
+  active.restart();
+});
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Tic-Tac-Toe</title>
+
+  <style>
+@import url('https://fonts.googleapis.com/css?family=Permanent+Marker');
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #999;
+  font-family: 'Permanent Marker', cursive;
+}
+
+#options, #alert {
+  position: absolute;
+  display: table;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: rgba(0,0,0,0.5);
+  font-size: 2rem;
+  color: #FFF;
+}
+
+#alert.hide {
+  visibility: hidden;
+}
+
+#alert .message {
+  color: #FFF;
+  font-size: 3rem;
+}
+
+#options.hide {
+  visibility: hidden;
+}
+
+#options > div, #alert > div {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+#options input[type=radio] {
+  border: 0px;
+  width: 2em;
+  height: 2em;
+}
+
+#options button, #alert button {
+  font-family: 'Permanent Marker', cursive;
+  width: 90%;
+  border: 2px solid #006;
+  border-radius: 10px;
+  background: rgba(0, 0, 230, 0.6);
+  color: white;
+  font-size: 1.5em;
+  padding: 10px auto;
+}
+
+#board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 575px;
+  background: #CCC;
+  padding: 20px;
+  border: 4px solid #333;
+  border-radius: 20px;
+  filter: blur(5px);
+}
+
+#board.clear {
+  filter: blur(0px);
+}
+
+#board #menu {
+  height: 75px;
+  width: 100%;
+  position: relative;
+}
+
+#menu #restartBtns {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#menu button#restart, #menu button#reset {
+  font-family: 'Permanent Marker', cursive;
+  border: 2px solid #600;
+  border-radius: 10px;
+  background: rgb(230, 0, 0);
+  color: white;
+  font-size: 1.5em;
+  padding: 10px 15px;
+}
+
+#menu button#reset {
+  border: 2px solid #060;
+  background: rgb(0, 230, 0);
+}
+
+#menu button#restart:active {
+  border-top: 2px solid #900;
+  border-left: 2px solid #900;
+  border-right: 2px solid #F00;
+  border-bottom: 2px solid #F00;
+}
+
+#menu button#reset:active {
+  border-top: 2px solid #090;
+  border-left: 2px solid #090;
+  border-right: 2px solid #0F0;
+  border-bottom: 2px solid #0F0;
+}
+
+#menu #player1, #menu #player2 {
+  float: left;
+  clear: both;
+  font-size: 1.2em;
+}
+
+#grid {
+  position: relative;
+  width: 100%;
+  height: 500px;
+}
+
+#grid .row {
+  width: 100%;
+  height: 33.33%;
+  /*background: #C00;*/
+}
+
+#board .row .cell {
+  position: relative;
+  width: 33.33%;
+  height: 100%;
+  float: left;
+  box-sizing: border-box;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  text-align: center;
+  font-size: 125px;
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000;
+}
+
+#board .row .cell span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#board .row .cell:last-of-type {
+  border-right: 0px;
+}
+
+#board .row:last-of-type .cell {
+  border-bottom: 0px;
+}
+    </style>
+
+</head>
+
+<body translate="no" >
+
+  <div id="alert" class="hide">
+  <div>
+    <p class="message"></p><br>
+    <button>Close</button>
+  </div>
+</div>
+
+<form id="options" onsubmit="return false;">
+  <div>
+    <p>
+      One, or two player game?<br>
+      <label><input type="radio" name="players" value="1" checked /> One Player</label>
+      <label><input type="radio" name="players" value="2" /> Two Players</label>
+    </p>
+    <p>
+      Will Player 1 be X, or O?<br>
+      <label><input type="radio" name="icon" value="X" checked /> X</label>
+      <label><input type="radio" name="icon" value="O" /> O</label>
+    </p>
+    <button>Start Game</button>
+  </div>
+</form>
+
+<div id="board">
+  <div id="menu">
+    <span id="player1"></span>
+    <span id="player2"></span>
+    <div id="restartBtns">
+      <button id="reset">Reset</button>
+      <button id="restart" onclick="game.restart()">Restart</button>
+    </div>
+  </div>
+  
+  <div id="grid">
+    <div class="row">
+      <div class="cell" id="cell0-0" onclick='game.move(0,0);'>&nbsp;</div>
+      <div class="cell" id="cell0-1" onclick='game.move(0,1);'>&nbsp;</div>
+      <div class="cell" id="cell0-2" onclick='game.move(0,2);'>&nbsp;</div>
+    </div>
+
+    <div class="row">
+      <div class="cell" id="cell1-0" onclick='game.move(1,0);'>&nbsp;</div>
+      <div class="cell" id="cell1-1" onclick='game.move(1,1);'>&nbsp;</div>
+      <div class="cell" id="cell1-2" onclick='game.move(1,2);'>&nbsp;</div>
+    </div>
+
+    <div class="row">
+      <div class="cell" id="cell2-0" onclick='game.move(2,0);'>&nbsp;</div>
+      <div class="cell" id="cell2-1" onclick='game.move(2,1);'>&nbsp;</div>
+      <div class="cell" id="cell2-2" onclick='game.move(2,2);'>&nbsp;</div>
+    </div>
+  </div>
+</div>
+  
+  <script>
+
+// http://neverstopbuilding.com/minimax
+// https://medium.freecodecamp.org/how-to-make-your-tic-tac-toe-game-unbeatable-by-using-the-minimax-algorithm-9d690bad4b37
+
+var gameState = function(_grid, _player1, _player2) {
+  // _grid, _turn, & _opponent are optional parameters (used to create a new gamestate
+  // from scratch) - if they are not set, then make set the correct values to initial defaults
+  var grid = _grid || [[],[],[]];
+  var player1 = _player1 || { icon: 'O', name: 'Player 1', color: '#C00' };
+  var player2 = _player2 || { icon: 'X', name: 'Player 2', color: '#0C0' };
+  
+  var turn = player1;
+  
+  var makeMove = function(row, col) {
+    // Ensure the provided coordinate is empty by using the 'get' function
+    // Also ensure the coordinates are valid (0 <= row < 3 && 0 <= col < 3)
+    if (!get(row, col) && row >= 0 && row < 3 && col >= 0 && col < 3) {
+      grid[row][col] = turn;
+      
+      // Toggle the 'turn' variable to be the other player
+      if (turn == player1)
+        turn = player2
+      else
+        turn = player1;
+      
+      // This lets the calling function know if it succeeded
+      return true;
+    } else {
+      // Return false, if for whatever reason we could not insert
+      return false;
+    }
+  };
+  
+  var get = function(row, col) {
+    //console.log('row: ' + row + '   col: ' + col + '   ' + grid[row][col]);
+    if (grid[row][col] == '') return false;
+    return grid[row][col];
+  };
+  
+  var reset = function() {
+    // Initialize a blank grid
+    for (var row = 0; row < 3; row++) {
+      for (var col = 0; col < 3; col++) {
+        grid[row][col] = '';
+      }
+    }
+  };
+  
+  return {
+    // Main functions
+    get: function(row, col) {
+      return get(row, col);
+    },
+    over: function() {
+      if (this.getWinner() || this.getValidMoves().length === 0) return true;
+      else return false;
+    },
+    makeMove: function(row, col) {
+      //console.log("Making move for " + turn.name + ' -  row: ' + row + ' col: ' + col);
+      if (this.over()) return 'Game is over';
+      return (makeMove(row, col)) ? '' : 'Invalid move';
+    },
+    reset: function() {
+      reset();
+      turn = player1;
+    },
+    getValidMoves: function() {
+      // If we have a winner, return an empty array indicating no valid moves left
+      if (this.getWinner()) return [];
+      
+      var moves = [];
+      for (var row = 0; row < 3; row++) {
+        for (var col = 0; col < 3; col++) {
+          // Check if the given cell is empty (empty === false, so use not - !)
+          if (!this.get(row, col)) {
+            moves.push({row: row, col: col});
+          }
+        }
+      }
+      return moves;
+    },
+    getWinner: function() {
+      // There are 8 conditions that would lead to a winner
+      // Check the 3 rows
+      // Row 1 check:
+      if (this.get(0,0) && 
+          this.get(0,0) == this.get(0,1) && 
+          this.get(0,1) == this.get(0,2)
+      ) {
+        return this.get(0,0);
+      }
+
+      // Row 2 check:
+      if (this.get(1,0) &&
+          this.get(1,0) == this.get(1,1) &&
+          this.get(1,1) == this.get(1,2)
+      ) {
+        return this.get(1,0);
+      }
+
+      // Row 3 check:
+      if (this.get(2,0) &&
+          this.get(2,0) == this.get(2,1) &&
+          this.get(2,1) == this.get(2,2)
+      ) {
+        return this.get(2,0);
+      }
+
+      // Check the 3 columns
+      // Column 1 check:
+      if (this.get(0,0) && 
+          this.get(0,0) == this.get(1,0) && 
+          this.get(1,0) == this.get(2,0)
+      ) {
+        return this.get(0,0);
+      }
+
+      // Column 2 check:
+      if (this.get(0,1) &&
+          this.get(0,1) == this.get(1,1) &&
+          this.get(1,1) == this.get(2,1)
+      ) {
+        return this.get(0,1);
+      }
+
+      // Column 3 check:
+      if (this.get(0,2) &&
+          this.get(0,2) == this.get(1,2) &&
+          this.get(1,2) == this.get(2,2)
+      ) {
+        return this.get(0,2);
+      }
+
+      // Diagonal checks
+      if (this.get(0,0) &&
+          this.get(0,0) == this.get(1,1) &&
+          this.get(1,1) == this.get(2,2)
+      ) {
+        return this.get(0,0);
+      }
+
+      if (this.get(0,2) &&
+          this.get(0,2) == this.get(1,1) &&
+          this.get(1,1) == this.get(2,0)
+      ) {
+        return this.get(0,2);
+      }
+      
+      return false;
+    },
+    makeUnique: function() {
+      var newGrid = [[],[],[]];
+      
+      for (var row = 0; row < 3; row++) {
+        for (var col = 0; col < 3; col++) {
+          newGrid[row][col] = grid[row][col];
+        }
+      }
+      
+      grid = newGrid;
+    },
+    // Get functions
+    getPlayer1: function() {
+      return player1;
+    },
+    getPlayer2: function() {
+      return player2;
+    },
+    getTurn: function() {
+      return turn;
+    },
+    getOtherPlayer: function() {
+      if (turn == player1)
+        return player2;
+      else
+        return player1;
+    },
+    getGrid: function() {
+      return grid;
+    },
+    setGrid: function(_grid) {
+      grid = _grid;
+    },
+    setPlayer1: function(player) {
+      player1 = player;
+    },
+    setPlayer2: function(player) {
+      player2 = player;
+    },
+    toString: function() {
+      var str = "\n";
+
+      for (var r = 0; r < 3; r++) {
+        for (var c = 0; c < 3; c++) {
+          // Unless this is the first column, prefix the output with a vertical bar
+          if (c > 0) str += '|';
+          
+          var loc = this.get(r, c);
+          
+          if (loc) {
+            str += ' ' + loc.icon + ' ';
+          } else {
+            str += '   ';
+          }
+        }
+        
+        // Unless this is the last row, end this row by inserting a horizontal line
+        if (r < 2) str += "\n-----------\n";
+      }
+
+      return str;
+    }
+  };
+};
+
+
+
+var ticTacToe = function(_players, _icon) {
+  var players = _players || 1;
+  var p1icon = _icon || 'X';
+  
+  var scores = {p1: 0, p2: 0};
+  
+  var theGame = new gameState();
+  theGame.reset();
+  
+  var choice;
+  
+  var init = function() {
+    var p1 = theGame.getPlayer1();
+    var p2 = theGame.getPlayer2();
+    
+    if (p1icon === 'X') {
+      p1.icon = 'X';
+      p2.icon = 'O';
+    } else {
+      p1.icon = 'O';
+      p2.icon = 'X';
+    }
+    
+    if (players === 1) {
+      p1.name = 'Player';
+      p2.name = 'Computer';
+    }
+    
+    theGame.setPlayer1(p1);
+    theGame.setPlayer2(p2);
+  };
+  
+  var score = function(_game, _depth) {
+    var test = _game || theGame;
+    var depth = _depth || 0;
+    
+    var winner = test.getWinner();
+
+    if (!winner)
+      return 0;
+    else if (winner == theGame.getPlayer1())
+      return 10 - depth;
+    else
+      return depth - 10;
+  };
+  
+  var findMax = function(arr) {
+    var index = 0;
+    
+    for (var i = 1; i < arr.length; i++) {
+      if (arr[i] > arr[index]) index = i;
+    }
+    
+    return index;
+  };
+  
+  var findMin = function(arr) {
+    var index = 0;
+    
+    for (var i = 1; i < arr.length; i++) {
+      if (arr[i] < arr[index]) index = i;
+    }
+    
+    return index;
+  };
+  
+  var doAlert = function(_msg) {
+    var msg = _msg || '';
+    var box = document.querySelector('#alert');
+    var message = document.querySelector('#alert .message');
+    var btn = document.querySelector('#alert button');
+    var board = document.querySelector('#board');
+
+    box.classList.remove('hide');
+    board.classList.remove('clear');
+    message.innerHTML = msg;
+
+    btn.onclick = function() {
+      box.classList.add('hide');
+      board.classList.add('clear');
+      message.innerHTML = '';
+    };
+  };
+  
+  var minmax = function(_game, _depth) {
+    var game = _game || theGame;
+    var depth = _depth || 0;
+    
+    // If the game is over, return the score so that we will not have an endless loop
+    // This will end the recursion
+    if (game.over())
+      return score(game, depth);
+    
+    depth += 1;
+    
+    var scores = [];
+    var moves = [];
+    
+    var validMoves = game.getValidMoves();
+    
+    // If there are 8 or more moves left, that means only 1 or zero moves have been played.
+    // Since calculating 8 levels deep is computationally expensive, just pre-decide what to do
+    // if only one or zero moves have been played (play the center if it's free, if not, then
+    // pick a corner) - this makes the function very fast for the first moves when otherwise
+    // it would be pretty slow
+    if (validMoves.length >= 8) {
+      if (!game.get(1,1)) {
+        choice = {row: 1, col: 1};
+        return 0;
+      } else {
+        choice = {row: 0, col: 0};
+        return 0;
+      }
+    }
+    
+    // Get all of the valid moves for this game state, and then loop through each one of them
+    validMoves.forEach(function(move) {
+      // Now, copy the current gameState into a new one, so that the original is left un-modified
+      var possibleGame = new gameState(game.getGrid(), game.getTurn(), game.getOtherPlayer());
+      possibleGame.makeUnique();  // If we don't do this, both objects will share the same grid
+      
+      // Now make the actual move as given by the forEach loop, consequences be damned :)
+      possibleGame.makeMove(move.row, move.col);
+      // By recursively calling minmax again, we will eventually get a base score based on this
+      // move. The deeper it goes, the less likely it is that we will choose this path.
+      scores.push(minmax(possibleGame, depth));
+      // Add this actual move to an array, so that we can later select it as being perhaps
+      // the best one... we won't know until after all of the potential moves are calculated
+      moves.push(move);
+    });
+    
+    // Now we need to decide what we are deciding. If this version of the gameState represents
+    // the human player, then we want to find what move they could make that would result in
+    // the highest score. If so, then that will represent the place the OPPONENT wants to be,
+    // hence why we are returning the highest index
+    if (game.getTurn() == theGame.getPlayer1()) {
+      // Find the scores index with the highest value (max)
+      var maxScoreIndex = findMax(scores);
+      // Select this index from the moves array, and then save that move in this
+      // object so that we can impliment it once the tree is resolved
+      choice = moves[maxScoreIndex];
+      // Return the scores value of the max index so that we can resolve the tree
+      // of values we've calculated.
+      return scores[maxScoreIndex];
+    // If this is the computer's turn, then we want to calculate the lowest possible score that
+    // the human player would get by the computer playing here. This means that this move would
+    // do the most damage to the player, thus, making it desireable
+    } else {
+      // Find the scores index with the lowest value (min)
+      var minScoreIndex = findMin(scores);
+      // Select this index from the moves array, and then save that move in this
+      // object so that we can impliment it once the tree is resolved
+      choice = moves[minScoreIndex];
+      // Return the scores value of the min index so that we can resolve the tree
+      // of values we've calculated
+      return scores[minScoreIndex];
+    }
+    
+    // Now, all said and done, we will eventually return the value of the end game state as the
+    // root of all the recursion. Whatever tree led to this score could potentially be the place
+    // to start placing a move, but this will only be determined by comparing the results as the
+    // recursion settles itself.
+    //
+    // Eventually each item within the 'scores' array will contain a value, such as 6 (meaning
+    // the player eventually would win after 4 rounds of back-and-forth). Depending on whose turn
+    // it is in that round (depth = 0 will be the computer) the MINIMUM score within the scores
+    // array will represent the move we want to make at this level (separately stored within a
+    // 'moves' array). Once we find that minimum index, we will set the global 'choice' object
+    // to that index. Since the root call of this function will resolve last, we can be sure
+    // that the last instance of 'choice' being changed will represent the desired move (there
+    // could potentially be others exactly equal in value, but that isn't entirely relevent)
+    //
+    // An interesting side-note is that this function ultimately returns the actual score used
+    // to determine the desired path. A way this could be re-written is to return an object
+    // containing both the score, and the move itself within it, thus allowing the recursive
+    // function to interact with object.score, and allowing the main call to the function
+    // interact with object.move (the actual desired move) but using a global object like this
+    // is just as easy, and perhaps saves some memory
+  };
+  
+  init();
+  
+  return {
+    move: function(row, col) {
+      // If the coordinate in the game is empty, then process the move
+      
+      if (!theGame.over() && !theGame.get(row, col)) {
+        console.log(theGame.getTurn().name + ' is moving to ' + row + ' ' + col);
+        var val = theGame.makeMove(row, col);
+        
+        this.render();
+        
+        var theScore = score();
+        
+        if (theGame.over() && theScore === 0) {
+          var winner = 'Tie game!';
+          this.alert(winner);
+          this.render();
+          return winner;
+        } else if (theScore === 10) {
+          var winner = theGame.getPlayer1().name + ' wins!';
+          scores.p1++;
+          this.alert(winner);
+          this.render();
+          return winner;
+        } else if (theScore === -10) {
+          var winner = theGame.getPlayer2().name + ' wins!';
+          scores.p2++;
+          this.alert(winner);
+          this.render();
+          return winner;
+        } else {
+          if (theGame.getTurn() == theGame.getPlayer2() && players === 1) {
+            // Get the computer's turn, and then take it
+            minmax(theGame);
+            this.move(choice.row, choice.col);
+            //return this.toString() + val;
+          }
+          return undefined;
+        }
+      } else {
+        return theGame.makeMove(row, col);
+      }
+    },
+    choice: function() {
+      return choice;
+    },
+    score: function() {
+      return score();
+    },
+    restart: function(){
+      theGame.reset();
+      this.render();
+      return theGame.toString();
+    },
+    toString: function() {
+      return theGame.toString();
+    },
+    alert: function(_msg) {
+      doAlert(_msg);
+    },
+    render: function() {
+      for (var row = 0; row < 3; row++) {
+        for (var col = 0; col < 3; col++) {
+          var value = theGame.get(row, col);
+          var elem = document.getElementById('cell' + row + '-' + col);
+          if (value) {
+            elem.innerHTML = '<span style="color:' + value.color + '">' + value.icon + '</span>';
+          } else {
+            elem.innerHTML = '';
+          }
+        }
+      }
+      
+      var player1 = theGame.getPlayer1();
+      var player2 = theGame.getPlayer2();
+      
+      document.querySelector('#menu #player1').innerHTML = player1.name + ' - (' + player1.icon + ') Score: ' + scores.p1;
+      document.querySelector('#menu #player2').innerHTML = player2.name + ' - (' + player2.icon + ') Score: ' + scores.p2;
+    }
+  };
+};
+
+
+var game;// = new ticTacToe();
+
+document.querySelector('#options button').onclick = function() {
+  var players = parseInt(document.querySelector('#options input[name="players"]:checked').value);
+  var icon = document.querySelector('#options input[name="icon"]:checked').value;
+  
+  game = new ticTacToe(players, icon);
+  game.render();
+  
+  document.querySelector('#options').classList.add("hide");
+  document.querySelector('#board').classList.add("clear");
+};
+
+document.querySelector('#reset').onclick = function() {
+  document.querySelector('#options').classList.remove("hide");
+  document.querySelector('#board').classList.remove("clear");
+};
+
+//document.getElementById('cell1-0').innerHTML = 'X';
+  </script>
+
+</body>
+</html>

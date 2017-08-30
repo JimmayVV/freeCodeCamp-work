@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Twitch Streamers</title>
+  
+  <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Roboto'>
+  
+      <style>
+/* CP CSS goes here */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+#wrapper {
+  min-width: 60%;
+  margin: 0 auto;
+  width: 700px;
+}
+
+header {
+  height: 95px;
+  line-height: 95px;
+  position: relative;
+  padding-left: 50px;
+  font-size: 2.5em;
+  font-weight: bold;
+}
+
+header, footer {
+  background-color: #999;
+}
+
+.toggles {
+  line-height: 1rem;
+  font-size: 1rem;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+  font-weight: normal;
+}
+
+.toggles label {
+  float: right;
+  clear: both;
+  width: 75px;
+  padding: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.toggles input[type=radio] {
+  display: none;
+}
+
+.toggles input[type=radio] + label:before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  line-height: 1em;
+  border: 1px solid #000;
+  display: inline-block;
+  position: relative;
+}
+
+.toggles input[type=radio]:checked + label {
+  background-color: #C00;
+}
+
+
+footer {
+  height: 10px;
+}
+
+.toggles input[type=radio] + label:nth-of-type(1):before {
+  background-color: #C0C;
+}
+
+.toggles input[type=radio] + label:nth-of-type(2):before {
+  background-color: #0CC;
+}
+
+.toggles input[type=radio] + label:nth-of-type(3):before {
+  background-color: #CC0;
+}
+
+#list {
+  display: block;
+  width: 100%;
+}
+
+#list div, #list div.offline {
+  background-color: #0CC;
+  border: 1px solid #330;
+  margin: 3px auto;
+  min-height: 75px;
+}
+
+#list div.online {
+  background-color: #CC0;
+}
+
+#list div img {
+  width: 50px;
+  border: 2px solid #FFF;
+  border-radius: 50%;
+  margin: 5px;
+}
+
+#list div span, #list div a {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  padding: 3px;
+}
+
+#list div a {
+  color: #00F;
+}
+
+#list div.error {
+  background-color: #CCC;
+  text-align: center;
+  font-style: italic;
+}
+
+#list div .name {
+  width: 100px;
+}
+
+#list div span.img {
+  width: 75px;
+}
+
+#list div span.bio {
+  text-align: center;
+}
+
+#list .hidden {
+  display: none;
+}
+    </style>
+
+
+</head>
+
+<body>
+  <!-- CP html goes here -->
+
+<form id="wrapper">
+  <header>
+    Twitch Streamers
+    <div class="toggles">
+      <input type="radio" name="selection" value="All" id="all" checked />
+      <label for="all">All</label>
+      <input type="radio" name="selection" value="Online" id="online" />
+      <label for="online">Online</label>
+      <input type="radio" name="selection" value="Offline" id="offline" />
+      <label for="offline">Offline</label>
+    </div>
+  </header>
+  <div id="list"></div>
+  <footer></footer>
+</form>
+  
+  <!-- End CP html -->
+  
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+  
+  <script>
+    // CP JS goes here
+var streamers = ["ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas", "comster404", "2ggaming"];
+
+// Twitch API URL
+var url = "https://wind-bow.gomix.me/twitch-api";
+
+$(document).ready(function(){
+  // This section of code will enable the view function to switch between
+  // 'all', 'online', and 'offline' streamers
+  $('input[type="radio"]').on("change", function(){
+    var selection = $(this).val();
+
+    if (selection === 'All') {
+      $("#list div").removeClass("hidden");
+    } else if (selection === 'Online') {
+      $("#list div.online, #list div.error").addClass("hidden");
+      $("#list div.offline").removeClass("hidden");
+    } else {
+      $("#list div.offline, #list div.error").addClass("hidden");
+      $("#list div.online").removeClass("hidden");
+    }
+  });
+
+  // This function will call an ajax query on a given index,
+  // targeting the streamers array
+  function pushElem(index) {
+    $.ajax({
+      url: url + '/users/' + streamers[index],
+      dataType: 'jsonp'
+    })
+      .done(function(data) {
+      // Notice the nested ajax calls, so that all of these will be done
+      // in order - don't want to start rendering a streamer before all
+      // data has been acquired
+      $.ajax({
+        url: url + /streams/ + streamers[index],
+        dataType: 'jsonp'
+      })
+        .done(function(stream){
+        if (!data.error) {
+          appendUser(data, stream.stream);
+        } else {
+          appendError(data);
+        }
+      });
+
+      // If the current index wasn't the last one, then call the next index
+      // This ensures we call these items sequentially
+      // NOTE: TODO: this might be better served within the nested ajax call
+      // above
+      if (index < streamers.length - 1) {
+        pushElem(index + 1);
+      }
+    })
+      .fail(function(){
+      alert("Unknown error");
+    });
+  }
+
+  // See this for how I actually want to proceed:
+  // http://stackoverflow.com/questions/5627284/pass-in-an-array-of-deferreds-to-when
+
+  // This will actually push the individual streamer to the HTML DOM
+  function appendUser(data, stream) {
+    var name = data.display_name;
+    var img = data.logo || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&f=y";
+    var bio;
+    var online = (stream === null) ? 'online' : 'offline';
+    var link = 'https://www.twitch.tv/' + data.name;
+
+    if (online !== 'offline') {
+      bio = "Offline";
+    } else {
+      bio = truncateString(stream.channel.status, 50);
+    }
+
+    $("#list").append('<div class="' + online + '"><span class="img"><img src="' + img + '"></span><a class="name" href="' + link + '" target="_blank">' + name + '</a><span class="bio">' + bio + '</span></div>');
+  }
+
+  // If there was an error, add a basic div element to the display DOM
+  function appendError(data) {
+    $("#list").append('<div class="error">' + data.message + '</div>');
+  }
+
+  // Helper function to truncate a string in a controlled way
+  // This exact function was a FCC algorithm challenge
+  function truncateString(str, num) {
+    // Quit function if str is null
+    if (str == null) return null;
+
+    // If the string length is longer than the truncate length, then proceed
+    if (str.length > num) {
+      // If the given number is greater than 3 (likely) then subtract 3, so that the final result (including ...) is the correct number of charaters
+      if (num > 3) {
+        num -= 3;
+      }
+
+      str = str.slice(0, num) + "...";
+    }
+
+    return str;
+  }
+
+  // Start the cascade of pushing streamers to the DOM by selecting the 
+  // first one. The pushElem function will then target all the rest of them
+  // in sequential order
+  pushElem(0);
+});
+  </script>
+
+</body>
+</html>

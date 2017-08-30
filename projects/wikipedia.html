@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Wikipedia Viewer</title>
+  
+  
+  <link rel='stylesheet prefetch' href='//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+  
+      <style>
+/* CP CSS goes here */
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+#container { 
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  height: 135px;
+  transition: top .3s, bottom .3s;
+}
+
+#wrap.active {
+  top: 0;
+  bottom: 135px;
+  transform: translate(-50%, 0%);
+}
+
+form * {
+  outline: 0;
+}
+
+form input {
+  font-size: 20px;
+  line-height: 16px;
+  padding: 2px;
+  height: 25px;
+  border: 5px solid #C60;
+  border-radius: 40px;
+  width: 25px;
+  transition: width .5s, padding .5s;
+}
+
+form input:focus, form input.keepOpen {
+  width: 200px;
+  padding: 2px 30px 2px 10px;
+}
+
+#wrap a {
+  color: #000;
+  font-weight: bold;
+  text-decoration: none;
+  padding-bottom: 20px;
+}
+
+#results {
+  position: fixed;
+  overflow: auto;
+  left: 0;
+  right: 0;
+  top: 100%;
+  bottom: 0;
+  /*background-color: #BBB;*/
+  transition: top .3s;
+}
+
+#results.active {
+  top: 135px;
+}
+
+#results a {
+  position: relative;
+  display: block;
+  width: 60%;
+  background-color: #EED;
+  margin: 10px auto;
+  padding: 10px 20px;
+  color: #000;
+  text-decoration: none;
+}
+
+#results a:hover {
+  background-color: #DDC;
+}
+
+#results a:hover:before {
+  position: absolute;
+  content: " ";
+  width: 5px;
+  left: -5px;
+  top: 0;
+  bottom: 0;
+  background-color: #CCC;
+}
+
+#results a h2 {
+  padding: 0 0 10px;
+  margin: 0;
+}
+
+#results a p {
+  padding: 0;
+  margin: 0;
+}
+    </style>
+
+
+</head>
+
+<body>
+  <!-- CP html goes here -->
+
+<div id="container">
+  <div id="wrap">
+    <p><a href="https://en.wikipedia.org/wiki/Special:Random" target="_blank">Click here for a random article</a></p>
+    <form>
+      <input type="text" name="term" onblur='clearForm(this)'>
+      <!--<button>Search</button>-->
+    </form>
+    <p>Click the orange circle to search</p>
+  </div>
+  
+  <div id="results">
+    
+  </div>
+</div>  
+
+  
+  <!-- End CP html -->
+  
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+  
+  <script>
+    // CP JS goes here
+var wikiUrl = "https://en.wikipedia.org/w/api.php?format=json&action=query&generator=search&gsrnamespace=0&gsrlimit=10&prop=pageimages|extracts&pilimit=max&exintro&explaintext&exsentences=1&exlimit=max&gsrsearch=";
+var pageUrl = 'https://en.wikipedia.org/?curid=';  // Add page id after this
+
+$("form").submit(function(){
+  var searchTerm = $("input[name='term']").val();
+  
+  if (searchTerm === "") return false;
+  
+  $("#wrap").addClass("active");
+  $("#results").addClass("active");
+  
+  searchTerm = encodeURIComponent(searchTerm).trim().replace(/%20+/ig, '+');
+  
+  $.ajax({
+    url: wikiUrl + searchTerm,
+    dataType: 'jsonp'
+  })
+  .done( function(data) {
+    renderResults(data);
+  })
+  .fail( function() {
+    alert("error");
+  });
+  
+  return false;
+});
+
+
+function renderResults(data) {
+  
+  $.each(data.query.pages, function(index, page) {
+    let id = page.pageid;
+    let title = page.title;
+    let snippet = page.extract;
+    
+    let content = '<a href="' + pageUrl + id + '" target="_blank">'
+                + '<h2>' + title + '</h2>'
+                + '<p>' + snippet + '</p></a>';
+    
+    $("#results").append(content);
+  });
+}
+
+function clearForm(el) {
+  if (!$("#results").hasClass("active")) {
+    el.value = '';
+  } else {
+    $('input[name="term"]').addClass("keepOpen");
+  }
+}
+  </script>
+
+</body>
+</html>
