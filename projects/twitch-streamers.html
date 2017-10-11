@@ -1,287 +1,234 @@
+
 <!DOCTYPE html>
-<html >
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<head>
-  <meta charset="UTF-8">
-  <title>Twitch Streamers</title>
-  
-  <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Roboto'>
-  
-      <style>
-/* CP CSS goes here */
-body {
-  font-family: 'Roboto', sans-serif;
-}
+    <title>Twitch Streamers</title>
 
-#wrapper {
-  min-width: 60%;
-  margin: 0 auto;
-  width: 700px;
-}
-
-header {
-  height: 95px;
-  line-height: 95px;
-  position: relative;
-  padding-left: 50px;
-  font-size: 2.5em;
-  font-weight: bold;
-}
-
-header, footer {
-  background-color: #999;
-}
-
-.toggles {
-  line-height: 1rem;
-  font-size: 1rem;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  text-align: left;
-  font-weight: normal;
-}
-
-.toggles label {
-  float: right;
-  clear: both;
-  width: 75px;
-  padding: 5px;
-  overflow: hidden;
-  position: relative;
-}
-
-.toggles input[type=radio] {
-  display: none;
-}
-
-.toggles input[type=radio] + label:before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 5px;
-  line-height: 1em;
-  border: 1px solid #000;
-  display: inline-block;
-  position: relative;
-}
-
-.toggles input[type=radio]:checked + label {
-  background-color: #C00;
-}
-
-
-footer {
-  height: 10px;
-}
-
-.toggles input[type=radio] + label:nth-of-type(1):before {
-  background-color: #C0C;
-}
-
-.toggles input[type=radio] + label:nth-of-type(2):before {
-  background-color: #0CC;
-}
-
-.toggles input[type=radio] + label:nth-of-type(3):before {
-  background-color: #CC0;
-}
-
-#list {
-  display: block;
-  width: 100%;
-}
-
-#list div, #list div.offline {
-  background-color: #0CC;
-  border: 1px solid #330;
-  margin: 3px auto;
-  min-height: 75px;
-}
-
-#list div.online {
-  background-color: #CC0;
-}
-
-#list div img {
-  width: 50px;
-  border: 2px solid #FFF;
-  border-radius: 50%;
-  margin: 5px;
-}
-
-#list div span, #list div a {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-  padding: 3px;
-}
-
-#list div a {
-  color: #00F;
-}
-
-#list div.error {
-  background-color: #CCC;
-  text-align: center;
-  font-style: italic;
-}
-
-#list div .name {
-  width: 100px;
-}
-
-#list div span.img {
-  width: 75px;
-}
-
-#list div span.bio {
-  text-align: center;
-}
-
-#list .hidden {
-  display: none;
-}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+          crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <style>
+      body {
+        padding-bottom: 10px;
+      }
+      
+      header {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
     </style>
+  </head>
+  <body>
+    <div class="container">
+      
+      <header class="row">
+        <div class="col">
+          <h1>
+            Twitch Streamers
+          </h1>
+        </div>
+        
+        <div class="col-sm-auto text-center">
+          <div class="btn-group" id="options" role="group" data-toggle="buttons" aria-label="Streamers Selectors">
+            <label class="btn btn-outline-primary active">
+              <input type="radio" name="options" value="All" autocomplete="off" checked>All
+            </label>
 
+            <label class="btn btn-outline-success">
+              <input type="radio" name="options" value="Online" autocomplete="off">Online
+            </label>
 
-</head>
+            <label class="btn btn-outline-danger">
+              <input type="radio" name="options" value="Offline" autocomplete="off">Offline
+            </label>
+          </div>
+        </div>
+      </header>
+      
+      <div class="row">
+        <div class="col-12 col-md-6 order-sm-1 order-2">
+          <div class="list-group" role="group" data-toggle="buttons" id="streamers">
+          </div>
+        </div>
+        
+        <div class="col order-md-1">
+          <div class="card w-100" id="streamInfo">
+            <div class="card-body">
+              Stream info
+            </div>
+          </div>
+        </div>
+        
+      </div><!-- .row -->
+    </div><!-- .container -->
 
-<body>
-  <!-- CP html goes here -->
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+            integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
+            integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+            crossorigin="anonymous"></script>
+    
+    <!-- Custom Scripts -->
+    <script>
+    var streamers = [
+      {user: "ESL_SC2",       stream: {}},
+      {user: "OgamingSC2",    stream: {}},
+      {user: "cretetion",     stream: {}},
+      {user: "freecodecamp",  stream: {}},
+      {user: "storbeck",      stream: {}},
+      {user: "habathcx",      stream: {}},
+      {user: "RobotCaleb",    stream: {}},
+      {user: "noobs2ninjas",  stream: {}},
+      {user: "comster404",    stream: {}},
+      {user: "2ggaming",      stream: {}}
+    ];
+      
+    function showStream(index) {
+      //console.log(JSON.stringify(streamers[index]));
+      var stream = streamers[index];
+      
+      //console.log(JSON.stringify(stream.stream));
+      
+      var $streamInfo = $('#streamInfo');
+      
+      var html = '';
+      
+      // Check if the stream info exists (AKA, online)
+      if (stream.stream !== null) {
+        if (stream.stream.channel.profile_banner)
+          html += '<img class="card-img-top" src="' + stream.stream.channel.profile_banner + '">';
 
-<form id="wrapper">
-  <header>
-    Twitch Streamers
-    <div class="toggles">
-      <input type="radio" name="selection" value="All" id="all" checked />
-      <label for="all">All</label>
-      <input type="radio" name="selection" value="Online" id="online" />
-      <label for="online">Online</label>
-      <input type="radio" name="selection" value="Offline" id="offline" />
-      <label for="offline">Offline</label>
-    </div>
-  </header>
-  <div id="list"></div>
-  <footer></footer>
-</form>
-  
-  <!-- End CP html -->
-  
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
-  
-  <script>
-    // CP JS goes here
-var streamers = ["ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas", "comster404", "2ggaming"];
-
-// Twitch API URL
-var url = "https://wind-bow.gomix.me/twitch-api";
-
-$(document).ready(function(){
-  // This section of code will enable the view function to switch between
-  // 'all', 'online', and 'offline' streamers
-  $('input[type="radio"]').on("change", function(){
-    var selection = $(this).val();
-
-    if (selection === 'All') {
-      $("#list div").removeClass("hidden");
-    } else if (selection === 'Online') {
-      $("#list div.online, #list div.error").addClass("hidden");
-      $("#list div.offline").removeClass("hidden");
-    } else {
-      $("#list div.offline, #list div.error").addClass("hidden");
-      $("#list div.online").removeClass("hidden");
+        html += '<div class="card-body">' +
+                  '<h4 class="card-title">' + stream.stream.channel.display_name + '</h4>' +
+                  '<p class="card-text">' + stream.stream.channel.status + '</p>' +
+                  '<a href="' + stream.stream.channel.url + '" target="_blank" class="btn btn-primary btn-block">View This Twitch Stream!</a>' +
+                '</div>';
+      } else {  // This means the channel is offline (typically)
+        html += '<div class="card-body"><h4 class="card-title">' + stream.data.display_name + ' is offline</h4></div>'
+      }
+      
+      $streamInfo.html(html);
     }
-  });
-
-  // This function will call an ajax query on a given index,
-  // targeting the streamers array
-  function pushElem(index) {
-    $.ajax({
-      url: url + '/users/' + streamers[index],
-      dataType: 'jsonp'
-    })
-      .done(function(data) {
-      // Notice the nested ajax calls, so that all of these will be done
-      // in order - don't want to start rendering a streamer before all
-      // data has been acquired
-      $.ajax({
-        url: url + /streams/ + streamers[index],
-        dataType: 'jsonp'
-      })
-        .done(function(stream){
-        if (!data.error) {
-          appendUser(data, stream.stream);
-        } else {
-          appendError(data);
+      
+    $(document).ready(function(){
+      
+      // Twitch API URL
+      var url = "https://wind-bow.gomix.me/twitch-api";
+      
+      // Upon view category status change, update the page to show the correct streamers
+      $('#options input[name="options"]').on('change', function() {
+        var selection = $(this).val();
+        
+        var $streamers = $('#streamers');
+        
+        $streamers.children().removeClass('d-none');
+        
+        if (selection === 'Online') {
+          $streamers.children('.list-group-item-secondary, .list-group-item-danger').addClass('d-none');
+        } else if (selection === 'Offline') {
+          $streamers.children('.list-group-item-secondary, .list-group-item-success').addClass('d-none');
         }
       });
-
-      // If the current index wasn't the last one, then call the next index
-      // This ensures we call these items sequentially
-      // NOTE: TODO: this might be better served within the nested ajax call
-      // above
-      if (index < streamers.length - 1) {
-        pushElem(index + 1);
+      
+      // Get the data for a specific user as defined by the index provided for the 'streamers' array.
+      // This function will get all data for this user, render it to the page, then call this same function
+      // again using the next index in the array. If it is the last index, then this method will be the last call
+      function pushElem(index) {
+        
+        $.ajax({
+          url: url + '/users/' + streamers[index].user,
+          dataType: 'jsonp'
+        }).done(function(data){
+          // Now that we have the user data for a user name, now let's use that information to get the stream info
+          $.ajax({
+            url: url + '/streams/' + streamers[index].user,
+            dataType: 'jsonp'
+          }).done(function(stream){
+            // Add the user data to the global object
+            streamers[index].data = data;
+            
+            // Now process the data
+            if (data.error) {
+              // Process the error
+              appendError(data);
+              streamers[index].stream = data.message;
+            } else {
+              // Process the data
+              appendUser(data, stream.stream, index);
+              streamers[index].stream = stream.stream;
+            }
+          });
+          
+          // If the current index wasn't the last one, then call the next index
+          // This ensures we call these items sequentially (as well as all of them)
+          if (index < streamers.length - 1) {
+            pushElem(index + 1);
+          }
+        });
       }
-    })
-      .fail(function(){
-      alert("Unknown error");
+      
+      
+      function appendUser(data, stream, index) {
+        var name = data.display_name;
+        var bio = '';
+        var offline = (stream === null) ? '<em>Offline</em>' : '<strong>Online</strong>';
+        var link = 'https://www.twitch.tv/' + data.name;
+        var cssClass = 'list-group-item-success';
+        
+        if (offline === '<em>Offline</em>') {
+          cssClass = 'list-group-item-danger';
+        } else {
+          bio = truncateString(stream.channel.status, 55);
+        }
+        
+        var html =  '<a href="#" class="list-group-item ' + cssClass + ' flex-column align-items-start" ' +
+                    'onclick="showStream('+index+')">' +
+                    '<div class="d-flex w-100 justify-content-between">' + 
+                    '<h4 class="mb-1">' + name + '</h4>' + 
+                    '<small>' + offline + '</small></div>' +
+                    '<p class="mb-1">' + bio + '</p></a>';
+        
+        $('#streamers').append(html);
+      }
+      
+      function appendError(data) {
+        $('#streamers').append('<div class="list-group-item list-group-item-secondary">' + data.message + '</div>');
+      }
+      
+      // Helper function to truncate a string in a controlled way
+      // This exact function was a FCC algorithm challenge
+      function truncateString(str, num) {
+        // Quit function if str is null
+        if (str == null) return null;
+
+        // If the string length is longer than the truncate length, then proceed
+        if (str.length > num) {
+          // If the given number is greater than 3 (likely) then subtract 3, so that the final result (including ...) is the correct number of charaters
+          if (num > 3) {
+            num -= 3;
+          }
+
+          str = str.slice(0, num) + "...";
+        }
+
+        return str;
+      }
+      
+      // Start the whole process by pushing the first element
+      pushElem(0);
     });
-  }
-
-  // See this for how I actually want to proceed:
-  // http://stackoverflow.com/questions/5627284/pass-in-an-array-of-deferreds-to-when
-
-  // This will actually push the individual streamer to the HTML DOM
-  function appendUser(data, stream) {
-    var name = data.display_name;
-    var img = data.logo || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&f=y";
-    var bio;
-    var online = (stream === null) ? 'online' : 'offline';
-    var link = 'https://www.twitch.tv/' + data.name;
-
-    if (online !== 'offline') {
-      bio = "Offline";
-    } else {
-      bio = truncateString(stream.channel.status, 50);
-    }
-
-    $("#list").append('<div class="' + online + '"><span class="img"><img src="' + img + '"></span><a class="name" href="' + link + '" target="_blank">' + name + '</a><span class="bio">' + bio + '</span></div>');
-  }
-
-  // If there was an error, add a basic div element to the display DOM
-  function appendError(data) {
-    $("#list").append('<div class="error">' + data.message + '</div>');
-  }
-
-  // Helper function to truncate a string in a controlled way
-  // This exact function was a FCC algorithm challenge
-  function truncateString(str, num) {
-    // Quit function if str is null
-    if (str == null) return null;
-
-    // If the string length is longer than the truncate length, then proceed
-    if (str.length > num) {
-      // If the given number is greater than 3 (likely) then subtract 3, so that the final result (including ...) is the correct number of charaters
-      if (num > 3) {
-        num -= 3;
-      }
-
-      str = str.slice(0, num) + "...";
-    }
-
-    return str;
-  }
-
-  // Start the cascade of pushing streamers to the DOM by selecting the 
-  // first one. The pushElem function will then target all the rest of them
-  // in sequential order
-  pushElem(0);
-});
-  </script>
-
-</body>
+    </script>
+  </body>
 </html>
