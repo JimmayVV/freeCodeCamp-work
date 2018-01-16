@@ -9,6 +9,10 @@ body {
   padding-bottom: 60px;
 }
 
+nav#mainNav.navbar {
+  background-color: rgb(0, 100, 0);
+}
+
 .footer {
   position: absolute;
   bottom: 0;
